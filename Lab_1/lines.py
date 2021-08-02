@@ -80,8 +80,8 @@ class Renderer(object):
 
     f.close()
   
-  def glFinish(self):
-    self.write('image.bmp')
+  def glFinish(self, filename):
+    self.write(filename)
 
   def line(self, x0, y0, x1, y1):
     dy = abs(y1 - y0)
@@ -120,6 +120,7 @@ class Renderer(object):
 
     for point in points:
       r.glVertex(*point)
+
   # Hacer un punto en la pantalla
   def glVertex(self, x, y, color = None):
     self.cont += 1
@@ -136,16 +137,46 @@ class Renderer(object):
       if y < self.refYL: # Menor en Y
         self.refYL = y
 
-      self.pointsFigure.append((x,y))
+      # Tomando todos los puntos de los bordes de la figura
+      self.pointsFigure.append([x,y])
       self.framebuffer[int(y)][int(x)] = color or self.color_point
     except IndexError:
       print("Estas fuera del limite de la imagen o viewport") 
-    
-print(".-.-.-.-.-.-.-.-.-.-.-.-. Bienvenido al generador de imagenes .-.-.-.-.-.-.-.-.-.-.-.-.")
 
+
+  def glPoligon(self, coordinates):
+    # Dibujando unicamente lo bordes
+    for i in range(len(coordinates) - 1):
+      r.line(coordinates[i][0], coordinates[i][1], coordinates[i+1][0], coordinates[i+1][1])
+      if i == len(coordinates) - 2:
+        last_item = len(coordinates) - 2
+        r.line(coordinates[last_item+1][0], coordinates[last_item+1][1], coordinates[0][0], coordinates[0][1])
+
+    # Calculando el punto central de la figura
+    centerX = ((r.refXM-r.refXL)/2) + r.refXL
+    centerY = ((r.refYM-r.refYL)/2) + r.refYL
+    points = r.pointsFigure
+    # Rellenano la imagen a traves del centro la figura
+    for point in range(len(points)):
+      r.line(centerX,centerY,points[point][0],points[point][1])
+    # Pintando un punto en el centro de la imagen
+    r.color_point = glClearColor(162,144,225)
+    r.glVertex(centerX,centerY)
+    
+
+poligono1 = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330), (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
+poligono2 = [(321, 335), (288, 286), (339, 251), (374, 302)]
+poligono3 = [(377, 249), (411, 197), (436, 249)]
+poligono4 = [(413, 177), (448, 159), (502, 88), (553, 53), (535, 36), (676, 37), (660, 52),
+(750, 145), (761, 179), (672, 192), (659, 214), (615, 214), (632, 230), (580, 230),
+(597, 215), (552, 214), (517, 144), (466, 180)]
+poligono5 = [(682, 175), (708, 120), (735, 148), (739, 170)]
+
+print(".-.-.-.-.-.-.-.-.-.-.-.-. Bienvenido al generador de imagenes .-.-.-.-.-.-.-.-.-.-.-.-.")
 size = True
 
 while (size):
+  print(".-.-.-.-.-.-.-.-.-.-.-.-. Usa 800x800 como recomendacion .-.-.-.-.-.-.-.-.-.-.-.-.")
   heightInput = int(input("Ingrese la altura de su archivo: "))
   widthInput = int(input("Ingrese el ancho de su archivo: "))
   if (heightInput > 0 and widthInput > 0):
@@ -153,66 +184,32 @@ while (size):
   else:
     print("Ingrese valores positivos")
 
-r = Renderer(heightInput, widthInput)
-
-
-a = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330),
-     (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
-
-for i in range(len(a) - 1):
-    r.line(a[i][0], a[i][1], a[i+1][0], a[i+1][1])
-    if i == len(a) - 2:
-        last_item = len(a) - 2
-        r.line(a[last_item+1][0], a[last_item+1][1], a[0][0], a[0][1])
-
-
-r.glFinish()
-print(r.refXM, r.refYM)
-print(r.refXL, r.refYL)
-area = (r.refXL-r.refXM)*(r.refYL-r.refYM)
-print("el area es : ", area)
 menu = True
+while (menu):
+  opcion = input("Que imagen desea rendereizar ?\n 1. Estrella \n 2. Rombo \n 3. Triangulo \n 4. Tetera \n 5. Poligono \n 6. Salir \n")
 
-while(menu):
-  print(" 1. Pintar un pixel en la pantalla  \n 2. Cambiar el color de fondo \n 3. Cambiar el color con el que se pinta un pixel (el de opcion 1)\n 4. Crear Lineas \n 5. Generar imagen \n 6. salir\n")
-  option = input(" ")
-  if (option == "1"):
-    xCord = float(input("Ingrese coordenada en x: "))
-    yCord = float(input("Ingrese coordenada en y: "))
-    r.glVertex(round(xCord),round(yCord))
-  elif (option == "2"):
-    ra = float(input("R: "))
-    g = float(input("G: "))
-    b = float(input("B: "))
-    if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
-      r.current_color = glClearColor(round(ra*255),round(g*255),round(b*255))
-      r.glClear()
-    else:
-      print("Ingresa valores entre 0 y 1")
-  elif (option == "3"):
-    ra = float(input("R: "))
-    g = float(input("G: "))
-    b = float(input("B: "))
-    if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
-      r.color_point = glClearColor(round(ra*255),round(g*255),round(b*255))
-      r.glClear()
-    else:
-      print("Ingresa valores entre 0 y 1")
-
-  elif (option == "4"):
-    print(".-.-.-.-.-.-. Inicio de linea .-.-.-.-.-.-.")
-    xCordS = float(input("Ingrese coordenada en x: "))
-    yCordS = float(input("Ingrese coordenada en y: "))
-    print(".-.-.-.-.-.-. Fin de linea .-.-.-.-.-.-.")
-    xCordE = float(input("Ingrese coordenada en x: "))
-    yCordE = float(input("Ingrese coordenada en y: "))
-    r.line(xCordS,yCordS,xCordE,yCordE)
-
-  elif (option == "5"):
-    print(" Archivo generado 'image.bmp' ")
-    r.glFinish()
-  elif (option == "6"):
-    print("Buena onda oralex")
+  if opcion == "1":
+    r = Renderer(heightInput, widthInput)
+    r.glPoligon(poligono1)
+    r.glFinish('render1.bmp')
+  elif opcion == "2":
+    r = Renderer(heightInput, widthInput)
+    r.glPoligon(poligono2)
+    r.glFinish('render2.bmp')
+  elif opcion == "3":
+    r = Renderer(heightInput, widthInput)
+    r.glPoligon(poligono3)
+    r.glFinish('render3.bmp')
+  elif opcion == "4":
+    r = Renderer(heightInput, widthInput)
+    r.glPoligon(poligono4)
+    r.glFinish('render4.bmp')
+  elif opcion == "5":
+    r = Renderer(heightInput, widthInput)
+    r.glPoligon(poligono5)
+    r.glFinish('render5.bmp')
+  elif opcion == "6":
+    print("Oralsex ")
     menu = False
   else:
-    print("Ingrese una opcion existente")
+    print("Opcion invalida")
