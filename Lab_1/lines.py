@@ -96,8 +96,8 @@ class Renderer(object):
       dy = abs(y1 - y0)
       dx = abs(x1 - x0)
 
-    offset = 0 * 2 * dx
-    threshold = 0.5 * 2 * dx
+    offset = 0
+    threshold = 2.5 * dx
     
     # y = mx + b
     if x1 < x0:
@@ -146,11 +146,11 @@ class Renderer(object):
 
   def glPoligon(self, coordinates):
     # Dibujando unicamente lo bordes
-    for i in range(len(coordinates) - 1):
-      r.line(coordinates[i][0], coordinates[i][1], coordinates[i+1][0], coordinates[i+1][1])
-      if i == len(coordinates) - 2:
-        last_item = len(coordinates) - 2
-        r.line(coordinates[last_item+1][0], coordinates[last_item+1][1], coordinates[0][0], coordinates[0][1])
+    for coor in range(len(coordinates) - 1):
+      r.line(coordinates[coor][0], coordinates[coor][1], coordinates[coor+1][0], coordinates[coor+1][1])
+      if coor == len(coordinates) - 2:
+        final = len(coordinates) - 2
+        r.line(coordinates[final+1][0], coordinates[final+1][1], coordinates[0][0], coordinates[0][1])
 
     # Calculando el punto central de la figura
     centerX = ((r.refXM-r.refXL)/2) + r.refXL
@@ -159,9 +159,10 @@ class Renderer(object):
     # Rellenano la imagen a traves del centro la figura
     for point in range(len(points)):
       r.line(centerX,centerY,points[point][0],points[point][1])
-    # Pintando un punto en el centro de la imagen
-    r.color_point = glClearColor(162,144,225)
-    r.glVertex(centerX,centerY)
+      r.line(centerX+12,centerY+12,points[point][0],points[point][1])
+      r.line(centerX,centerY-12,points[point][0],points[point][1])
+      r.line(centerX-12,centerY-12,points[point][0],points[point][1])
+      r.line(centerX-12,centerY,points[point][0],points[point][1])
     
 
 poligono1 = [(165, 380), (185, 360), (180, 330), (207, 345), (233, 330), (230, 360), (250, 380), (220, 385), (205, 410), (193, 383)]
@@ -203,13 +204,23 @@ while (menu):
   elif opcion == "4":
     r = Renderer(heightInput, widthInput)
     r.glPoligon(poligono4)
+    # Cambiar color a negro para pintar el agujero
+    # Setear de nuevo todo a cero para la segunda figura
+    r.color_point = glClearColor(0,0,0)
+    r.refXM = 0
+    r.refXL = 0
+    r.refYM = 0
+    r.refYL = 0
+    r.pointsFigure = []
+    r.cont = 0 
+    r.glPoligon(poligono5)
     r.glFinish('render4.bmp')
   elif opcion == "5":
     r = Renderer(heightInput, widthInput)
     r.glPoligon(poligono5)
     r.glFinish('render5.bmp')
   elif opcion == "6":
-    print("Oralsex ")
+    print("Orale ")
     menu = False
   else:
     print("Opcion invalida")
