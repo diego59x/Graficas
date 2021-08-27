@@ -159,74 +159,74 @@ class Renderer(object):
 
 print("Bienvenido al generador de imagenes")
 
-size = True
+# size = True
 
-while(size):
-  heightInput = int(input("Ingrese la altura de su archivo: "))
-  widthInput = int(input("Ingrese el ancho de su archivo: "))
-  if (heightInput > 0 and widthInput > 0):
-    size = False
-  else:
-    print("Ingrese valores positivos")
+# while(size):
+#   heightInput = int(input("Ingrese la altura de su archivo: "))
+#   widthInput = int(input("Ingrese el ancho de su archivo: "))
+#   if (heightInput > 0 and widthInput > 0):
+#     size = False
+#   else:
+#     print("Ingrese valores positivos")
 
 
-r = Renderer(heightInput, widthInput)
+r = Renderer(5000, 5000)
 r.load('./Clase_4/Models/bears.obj', [6,-12], [350,350])
+r.glFinish()
+# menu = True
 
-menu = True
-
-while(menu):
-  print(" 1. Pintar un pixel en la pantalla  \n 2. Cambiar el color de fondo \n 3. Definir el area en la que se pinta \n 4. Cambiar el color con el que se pinta un pixel (el de opcion 1)\n 5. Generar imagen \n 6. salir\n")
-  option = input(" ")
-  if (option == "1"):
-    xCord = float(input("Ingrese coordenada en x: "))
-    yCord = float(input("Ingrese coordenada en y: "))
-    if (r.widthView > 0 and r.heightView > 0):
-      if ((xCord <= 1 and xCord >= -1) and (yCord <= 1 and yCord >= -1)):
-        r.glVertex(int(xCord*r.widthView),int(yCord*r.heightView))
-      else:
-        print("Las coordenadas deben estar entre 0 y 1")
-    else:
-      print("Defina el viewport primero (opcion 3) ")
-  elif (option == "2"):
-    ra = float(input("R: "))
-    g = float(input("G: "))
-    b = float(input("B: "))
-    if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
-      r.current_color = glClearColor(int(ra*255),int(g*255),int(b*255))
-      r.glClear()
-    else:
-      print("Ingresa valores entre 0 y 1")
-  elif (option == "3"):
+# while(menu):
+#   print(" 1. Pintar un pixel en la pantalla  \n 2. Cambiar el color de fondo \n 3. Definir el area en la que se pinta \n 4. Cambiar el color con el que se pinta un pixel (el de opcion 1)\n 5. Generar imagen \n 6. salir\n")
+#   option = input(" ")
+#   if (option == "1"):
+#     xCord = float(input("Ingrese coordenada en x: "))
+#     yCord = float(input("Ingrese coordenada en y: "))
+#     if (r.widthView > 0 and r.heightView > 0):
+#       if ((xCord <= 1 and xCord >= -1) and (yCord <= 1 and yCord >= -1)):
+#         r.glVertex(int(xCord*r.widthView),int(yCord*r.heightView))
+#       else:
+#         print("Las coordenadas deben estar entre 0 y 1")
+#     else:
+#       print("Defina el viewport primero (opcion 3) ")
+#   elif (option == "2"):
+#     ra = float(input("R: "))
+#     g = float(input("G: "))
+#     b = float(input("B: "))
+#     if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
+#       r.current_color = glClearColor(int(ra*255),int(g*255),int(b*255))
+#       r.glClear()
+#     else:
+#       print("Ingresa valores entre 0 y 1")
+#   elif (option == "3"):
     
-    size = True
-    while(size):
-      xCord = int(input("Ingrese coordenada en x del viewport: "))
-      yCord = int(input("Ingrese coordenada en y del viewport: "))
-      widthInput = int(input("Ingrese el ancho del viewport: "))
-      heightInput = int(input("Ingrese la altura del viewport: "))
-      if (widthInput > 0 and heightInput > 0 and xCord > 0 and yCord > 0):
-        size = False
-        r.glViewPort(xCord,yCord,heightInput,widthInput)
-      else:
-        print("Ingrese valores positivos")
+#     size = True
+#     while(size):
+#       xCord = int(input("Ingrese coordenada en x del viewport: "))
+#       yCord = int(input("Ingrese coordenada en y del viewport: "))
+#       widthInput = int(input("Ingrese el ancho del viewport: "))
+#       heightInput = int(input("Ingrese la altura del viewport: "))
+#       if (widthInput > 0 and heightInput > 0 and xCord > 0 and yCord > 0):
+#         size = False
+#         r.glViewPort(xCord,yCord,heightInput,widthInput)
+#       else:
+#         print("Ingrese valores positivos")
     
-  elif (option == "4"):
-    ra = float(input("R: "))
-    g = float(input("G: "))
-    b = float(input("B: "))
-    if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
-      r.color_point = glClearColor(int(ra*255),int(g*255),int(b*255))
-      r.glClear()
-    else:
-      print("Ingresa valores entre 0 y 1")
-  elif (option == "5"):
-    print(" Archivo generado 'image.bmp' ")
-    r.glFinish()
-  elif (option == "6"):
-    print("Buena onda oralex")
-    menu = False
-  else:
-    print("Ingrese una opcion existente")
+#   elif (option == "4"):
+#     ra = float(input("R: "))
+#     g = float(input("G: "))
+#     b = float(input("B: "))
+#     if ((ra <= 1 and ra >= 0) and (g <= 1 and g >= 0) and (b <= 1 and b >= 0) ):
+#       r.color_point = glClearColor(int(ra*255),int(g*255),int(b*255))
+#       r.glClear()
+#     else:
+#       print("Ingresa valores entre 0 y 1")
+#   elif (option == "5"):
+#     print(" Archivo generado 'image.bmp' ")
+#     r.glFinish()
+#   elif (option == "6"):
+#     print("Buena onda oralex")
+#     menu = False
+#   else:
+#     print("Ingrese una opcion existente")
 
 

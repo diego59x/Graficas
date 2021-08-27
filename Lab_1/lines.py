@@ -113,10 +113,10 @@ class Renderer(object):
       else:
         points.append((x, y))
 
-      offset += (dy/dx) * 2 * dx
+      offset += dy * 2 
       if offset >= threshold:
         y += 1 if y0 < y1 else -1
-        threshold += 1 * 2 * dx
+        threshold += 2 * dx
 
     for point in points:
       r.glVertex(*point)
