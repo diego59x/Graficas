@@ -1,5 +1,5 @@
 import struct
-from obj import Obj
+from obj import Obj, Texture
 from lib import *
 from collections import namedtuple
 
@@ -33,9 +33,9 @@ class Renderer(object):
     # File header (14 bytes)
     f.write(char('B'))
     f.write(char('M'))
-    f.write(dword(14 + 40 + self.width * self.height * 3))
+    f.write(dword(54 + self.width * self.height * 3))
     f.write(dword(0))
-    f.write(dword(14 + 40))
+    f.write(dword(54))
 
     # Image header (40 bytes)
     f.write(dword(40))
@@ -58,17 +58,7 @@ class Renderer(object):
     f.close()
 
   def display(self, filename='out.bmp'):
-    
     self.write(filename)
-
-    try:
-      from wand.image import Image
-      from wand.display import display
-
-      with Image(filename=filename) as image:
-        display(image)
-    except ImportError:
-      pass  # do nothing if no wand is installed
 
   def set_color(self, color):
     self.current_color = color
@@ -103,14 +93,13 @@ class Renderer(object):
           continue
         
         if self.current_texture:
-          tA, tB, tC = texture_coords
           tx = tA.x * w + tB.x * v + tC.x * u
           ty = tA.y * w + tB.y * v + tC.y * u
           
           fcolor = self.current_texture.get_color(tx,ty)
           col = fcolor * intensity
         else:
-            col = WHITE * intensity
+          col = WHITE * intensity
 
         z = A.z * w + B.z * v + C.z * u
 
@@ -133,7 +122,7 @@ class Renderer(object):
     model = Obj(filename)
     vertex_buffer_object = []
 
-    for face in model.faces:
+    for face in model.vfaces:
         for v in range(len(face)):
             vertex = self.transform(model.vertices[face[v][0] - 1], translate, scale)
             vertex_buffer_object.append(vertex)
@@ -147,7 +136,7 @@ class Renderer(object):
 
 
   def draw_arrays(self, polygon):
-    if polyhon == 'WIREFRAME':
+    if polygon == 'WIREFRAME':
       pass
     elif polygon == 'TRIANGLES':
       try:
@@ -157,8 +146,8 @@ class Renderer(object):
           print('Done')
 
 
-# r = Renderer(800,600)
-# r.current_texture = Texture
-# r.load('./models/model.obj',(1, 1, 1), (300, 300, 300))
-# r.draw_arrays('TRIANGLES')
-# r.glFinish()
+r = Renderer(800,600)
+r.current_texture = Texture('./models/earth.bmp')
+r.load('./models/earth.obj',(1, 1, 1), (300, 300, 300))
+r.draw_arrays('TRIANGLES')
+r.display()
