@@ -107,7 +107,7 @@ class Renderer(object):
           continue
 
         if x < len(self.zbuffer) and y < len(self.zbuffer[x]) and z > self.zbuffer[x][y]:
-          self.point(x, y, color)
+          self.point(x, y, col)
           self.zbuffer[x][y] = z
 
   def transform(self, vertex, translate=(0, 0, 0), scale=(1, 1, 1)):
@@ -146,8 +146,8 @@ class Renderer(object):
           print('Done')
 
 
-r = Renderer(800,600)
-r.current_texture = Texture('./models/earth.bmp')
-r.load('./models/earth.obj',(1, 1, 1), (300, 300, 300))
-r.draw_arrays('TRIANGLES')
-r.display()
+# r = Renderer(800,600)
+# r.current_texture = Texture('./VertexBuffer/models/earth.bmp')
+# r.load('./VertexBuffer/models/earth.obj',(1, 1, 1), (300, 300, 300))
+# r.draw_arrays('TRIANGLES')
+# r.display()

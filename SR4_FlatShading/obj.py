@@ -17,7 +17,10 @@ class Obj(object):
     def read(self):
         for line in self.lines:
             if line:
-                prefix, value = line.split(' ', 1)
+                try: 
+                    prefix, value = line.split(' ', 1)
+                except:
+                    prefix = ''
                 if prefix == 'v':
                     self.vertices.append(list(map(float, value.split(' '))))
                 elif prefix == 'f':

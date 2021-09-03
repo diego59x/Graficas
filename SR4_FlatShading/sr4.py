@@ -1,7 +1,6 @@
 import struct
 from obj import Obj
 from collections import namedtuple
-import random 
 
 def char(c):
   # char
@@ -14,6 +13,9 @@ def word(w):
 def dword(w):
   # long
   return struct.pack('=l', w)
+
+def color(r, g, b):
+    return bytes([b, g, r])
 
 def minBox(A, B ,C):
   xmins = [A.x, B.x, C.x]
@@ -40,7 +42,7 @@ def barycentric(A, B, C, P):
     V3(B.y - A.y, C.y - A.y, A.y - P.y )
   )
   
-  if cz == 0:
+  if abs(cz) < 1:
     return -1, -1, -1
 
   u = cx / cz 
@@ -87,7 +89,7 @@ class Renderer(object):
     self.height = height
     self.current_color = BLACK
     self.color_point = WHITE
-    self.light = V3(0,0,1)
+    self.light = V3(0, 0, 1)
     self.glClear()
 
   def glClear(self):
@@ -131,42 +133,7 @@ class Renderer(object):
     f.close()
   
   def glFinish(self):
-    self.write('image.bmp')
-
-
-  def line(self, x0, y0, x1, y1):
-    dy = abs(y1 - y0)
-    dx = abs(x1 - x0)
-
-    steep = dy > dx
-
-    if steep:
-      x0, y0 = y0, x0
-      x1, y1 = y1, x1
-
-    if x1 < x0:
-      x0, x1 = x1, x0
-      y0, y1 = y1, y0
-
-    dy = abs(y1 - y0)
-    dx = abs(x1 - x0)
-
-    offset = 0 
-    threshold = dx
-    
-    # # y = mx + b
-    
-    y = y0
-    for x in range(x0, x1 + 1):
-      if steep:
-        self.glVertex(y, x)
-      else:
-        self.glVertex(x, y)
-
-      offset += dy * 2 
-      if offset >= threshold:
-        y += 1 if y0 < y1 else -1
-        threshold += 2 * dx
+    self.write(b'image.bmp')
 
   def glVertex(self, x, y, color=None):
     #print("coordenadas ", x, y)
@@ -188,74 +155,72 @@ class Renderer(object):
             self.zbuffer[x][y] = z
         except:
           pass
-  def transform(self, vertex, translate=(0, 0, 0), scale=(1, 1, 1)):
+  def transform(self, vertex, translate, scale):
     return V3( 
-      round((vertex[0] + translate[0] * scale[0])),
-      round((vertex[1] + translate[1] * scale[1])),
-      round((vertex[2] + translate[2] * scale[2]))
+      round((vertex[0] * scale[0] + translate[0])),
+      round((vertex[1] * scale[1] + translate[1])),
+      round((vertex[2] * scale[2] + translate[2]))
     )
-  def load(self, filename, translate=(0, 0, 0), scale=(1, 1, 1)):
+  def load(self, filename, translate, scale):
 
     model = Obj(filename)
-    self.light = norm(V3(2,3,1))
+
     for face in model.vfaces:
-        vcount = len(face)
-        if vcount == 3:
-          f1 = face[0][0] - 1 
-          f2 = face[1][0] - 1 
-          f3 = face[2][0] - 1
+      vcount = len(face)
 
-          a = self.transform(model.vertices[f1], translate, scale)
-          b = self.transform(model.vertices[f2], translate, scale)
-          c = self.transform(model.vertices[f3], translate, scale)
-          
+      if vcount == 3:
+        face1 = face[0][0] - 1
+        face2 = face[1][0] - 1
+        face3 = face[2][0] - 1
 
-          normal = norm(cross(
-            sub(b,a),
-            sub(c,a)
-          ))
+        v1 = model.vertices[face1]
+        v2 = model.vertices[face2]
+        v3 = model.vertices[face3]
 
-          intensity = dot(normal, self.light)
- 
+        a = self.transform(v1,translate, scale)
+        b = self.transform(v2,translate, scale)
+        c = self.transform(v3,translate, scale)
+     
+        normal = cross(sub(b, a), sub(c, a))
+        intensity = dot(norm(normal), norm(self.light))
+        grey = round(255 * intensity)
+        if grey < 0:
+          continue
+
+        intensity_color = color(grey, grey, grey)
+        self.triangle(a, b, c, intensity_color)
+      else:
+          face1 = face[0][0] - 1
+          face2 = face[1][0] - 1
+          face3 = face[2][0] - 1
+          face4 = face[3][0] - 1
+
+          v1 = model.vertices[face1]
+          v2 = model.vertices[face2]
+          v3 = model.vertices[face3]
+          v4 = model.vertices[face4]
+
+          a = self.transform(v1,translate, scale)
+          b = self.transform(v2,translate, scale)
+          c = self.transform(v3,translate, scale)
+          d = self.transform(v4,translate, scale)
+
+          normal = cross(sub(b, a), sub(c, a))
+
+          intensity = dot(norm(normal), norm(self.light))
           grey = round(255 * intensity)
-          if intensity < 0:
+          if grey < 0:
             continue
-          
 
-          self.triangle(a, b, c, glClearColor(
-            grey,
-            grey,
-            grey
-          ))
-        else:
-          f1 = face[0][0] - 1 
-          f2 = face[1][0] - 1 
-          f3 = face[2][0] - 1
-          f4 = face[3][0] - 1
-          grey = 150
-          vertices = [
-            self.transform(model.vertices[f1], translate, scale),
-            self.transform(model.vertices[f2], translate, scale),
-            self.transform(model.vertices[f3], translate, scale),
-            self.transform(model.vertices[f4], translate, scale)
-          ]
-          A, B, C, D = vertices
+          intensity_color = color(grey, grey, grey)
 
-          self.triangle(A, B, C, glClearColor(
-            grey,
-            grey,
-            grey
-            )  
-          )
-          self.triangle(A, C, D, glClearColor(
-            grey,
-            grey,
-            grey
-            )  
-          )
+          self.triangle(a, b, c, intensity_color)
+          self.triangle(a, c, d, intensity_color)
+
+
 
 print("Bienvenido al generador de imagenes")
 
 r = Renderer(800,600)
-r.load('./SR4_FlatShading/models/face.obj',(25, 5, 0), (15, 15, 15))
+r.load('./SR4_FlatShading/models/porsche.obj',(400, 300, 1), (200, 200, 200))
 r.glFinish()
