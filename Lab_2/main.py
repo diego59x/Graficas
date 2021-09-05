@@ -1,6 +1,7 @@
 import struct
 from obj import Obj, Texture
 from lib import *
+import random
 from collections import namedtuple
 
 # ===============================================================
@@ -63,6 +64,44 @@ class Renderer(object):
   def set_color(self, color):
     self.current_color = color
 
+  def line(self, x0, y0, x1, y1, color=None):
+    dy = abs(y1 - y0)
+    dx = abs(x1 - x0)
+
+    steep = dy > dx
+
+    if steep:
+      x0, y0 = y0, x0
+      x1, y1 = y1, x1
+
+      dy = abs(y1 - y0)
+      dx = abs(x1 - x0)
+
+    offset = 0
+    threshold = 2.5 * dx
+    
+    # y = mx + b
+    if x1 < x0:
+      y = y1
+      x0, x1 = x1, x0
+      y0, y1 = y1, y0
+    else:
+      y = y0
+    points = []
+    for x in range(int(x0), int(x1)):
+      if steep:
+        points.append((y, x))
+      else:
+        points.append((x, y))
+
+      offset += dy * 2 
+      if offset >= threshold:
+        y += 1 if y0 < y1 else -1
+        threshold += 2 * dx
+
+    for point in points:
+      r.point(*point,color)
+
   def point(self, x, y, color = None):
     # 0,0 was intentionally left in the bottom left corner to mimic opengl
     try:
@@ -71,15 +110,52 @@ class Renderer(object):
       # To avoid index out of range exceptions
       pass
 
+  def shader(self,x,y):
+    x_center , y_center = 405, 310
+    radius = 200
+    x_centerDown , y_centerDown = 450, 200
+    radiusDown = 10
+    radiusPoint = 8
+    # Circulo de derecha abajo 
+    if (x - x_centerDown )**2 + (y  - y_centerDown )**2   < (radiusDown**2 ):
+      if (x - x_centerDown )**2 + (y  - y_centerDown )**2   < (radiusPoint**2 ):
+          self.point(x,y,color(27,23,21))
+          return color(27,23,21)
+      self.line(x_centerDown,y_centerDown,(x_centerDown+random.randint(-40,30)),y_centerDown+random.randint(-40,90),color(255,255,255))
+      return color(255,255,255)
+    # Elipse
+    if (self.elipse(x_center, y_center + 40, x , y * random.randint(0,3) ,180,130) < 1):
+      self.point(x, y, color(120,74,38))
+      return color(120,74,38)
+    if (x - 300 )**2 + (y  - 300 )**2   < (20**2 ):
+      self.line(x,y,(300+random.randint(-40,30)),300+random.randint(-40,90),color(120,74,38))
+      return color(120,74,38)
+    if (x > 590):
+      lineX, lineY = self.square(595,580,340,320)
+      self.line(lineX, lineY,x_center,y_center, color(120,74,38))
+
+    if (x * random.randint(0,3) - x_center )**2 + (y * random.randint(0,3)< - y_center )**2   > (radius**2 ):
+      self.point(x,y ,color(200,200,200))
+      
+      return color(200,200,200)
+
+    
+    #print(A.x,A.y,A.z)
+    return color(255,255,255)
+
+  def square(self,refXM,refXL,refYM,refYL):
+    centerX = ((refXM-refXL)/2) + refXL
+    centerY = ((refYM-refYL)/2) + refYL
+    return int(centerX), int(centerY)
+
+  def elipse(self,h,k,x,y,a,b):
+    inside = ((((x - h)**2) / a ** 2) + ((y - k)** 2 / b**2))
+    return inside
+
   def triangle(self):
     A = next(self.active_vertex_array)
     B = next(self.active_vertex_array)
     C = next(self.active_vertex_array)
-
-    if self.current_texture:
-        tA = next(self.active_vertex_array)
-        tB = next(self.active_vertex_array)
-        tC = next(self.active_vertex_array)
 
     bbox_min, bbox_max = bbox(A, B, C)
 
@@ -89,17 +165,10 @@ class Renderer(object):
     for x in range(bbox_min.x, bbox_max.x + 1):
       for y in range(bbox_min.y, bbox_max.y + 1):
         w, v, u = barycentric(A, B, C, V3(x, y))
-        if w < 0 or v < 0 or u < 0:  # 0 is actually a valid value! (it is on the edge)
+        if w < 0 or v < 0 or u < 0: 
           continue
         
-        if self.current_texture:
-          tx = tA.x * w + tB.x * v + tC.x * u
-          ty = tA.y * w + tB.y * v + tC.y * u
-          
-          fcolor = self.current_texture.get_color(tx,ty)
-          col = fcolor * intensity
-        else:
-          col = WHITE * intensity
+        col = self.shader(x,y)# *intensity
 
         z = A.z * w + B.z * v + C.z * u
 
@@ -127,11 +196,6 @@ class Renderer(object):
             vertex = self.transform(model.vertices[face[v][0] - 1], translate, scale)
             vertex_buffer_object.append(vertex)
 
-        if self.current_texture:
-            for v in range(len(face)):
-                tvertex = V3(*model.tvertices[face[v][1] - 1])
-                vertex_buffer_object.append(tvertex)
-
     self.active_vertex_array = iter(vertex_buffer_object)
 
 
@@ -146,8 +210,7 @@ class Renderer(object):
           print('Done')
 
 
-# r = Renderer(800,600)
-# r.current_texture = Texture('./VertexBuffer/models/earth.bmp')
-# r.load('./VertexBuffer/models/earth.obj',(1, 1, 1), (300, 300, 300))
-# r.draw_arrays('TRIANGLES')
-# r.display()
+r = Renderer(800,600)
+r.load('./Lab_2/models/esfera.obj',(400, 300, 1), (400, 400, 400))
+r.draw_arrays('TRIANGLES')
+r.display()
