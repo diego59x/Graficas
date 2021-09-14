@@ -1,12 +1,7 @@
-from numpy import *
+from NumpyDiego import *
 from gl import *
 
 r = Renderer(800,800)
-
-print(matrix([
-    [1,1],
-    [1,1]    
-]))
 
 def line(A,B):
     x0, y0, x1, y1 = A.x, A.y , B.x, B.y

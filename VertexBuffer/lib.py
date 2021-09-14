@@ -92,7 +92,7 @@ def bbox(*vertices):
   xs.sort()
   ys.sort()
 
-  return V3(xs[0], ys[0]), V3(xs[-1], ys[-1])
+  return V3(round(xs[0]), round(ys[0])), V3(round(xs[-1]), round(ys[-1]))
 
 def barycentric(A, B, C, P):
    

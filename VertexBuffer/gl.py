@@ -1,6 +1,7 @@
 import struct
 from obj import Obj, Texture
 from lib import *
+from NumpyDiego import *
 from collections import namedtuple
 
 # ===============================================================
@@ -81,10 +82,12 @@ class Renderer(object):
         tB = next(self.active_vertex_array)
         tC = next(self.active_vertex_array)
 
+    nA = next(self.active_vertex_array)
+    nB = next(self.active_vertex_array)
+    nC = next(self.active_vertex_array)
+
     bbox_min, bbox_max = bbox(A, B, C)
 
-    normal = norm(cross(sub(B, A), sub(C, A)))
-    intensity = dot(normal, self.light)
 
     for x in range(bbox_min.x, bbox_max.x + 1):
       for y in range(bbox_min.y, bbox_max.y + 1):
@@ -97,9 +100,9 @@ class Renderer(object):
           ty = tA.y * w + tB.y * v + tC.y * u
           
           fcolor = self.current_texture.get_color(tx,ty)
-          col = fcolor * intensity
+          col = self.active_shader(self, triangle=(A,B,C), bar=(w,v,u), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
         else:
-          col = WHITE * intensity
+          col = WHITE * 1
 
         z = A.z * w + B.z * v + C.z * u
 
@@ -110,21 +113,36 @@ class Renderer(object):
           self.point(x, y, col)
           self.zbuffer[x][y] = z
 
-  def transform(self, vertex, translate, scale):
+  def transform(self, vertex):
     # returns a vertex 3, translated and transformed
-    return V3(
-      round((vertex[0] * scale[0] + translate[0])),
-      round((vertex[1] * scale[1] + translate[1])),
-      round((vertex[2] * scale[2] + translate[2]))
-    )
+
+    augmented_vertex = [
+      vertex[0],
+      vertex[1],
+      vertex[2]
+    ]
+  # multiplicar un array por matriz https://integratedmlai.com/basic-linear-algebra-tools-in-pure-python-without-numpy-or-scipy/
+    transformed_vertex = matrix_multiply( self.Viewport, matrix_multiply( self.Projection, matrix_multiply(self.View, matrix_multiply( self.Model, augmented_vertex))))
+
+    transformed_vertex = transformed_vertex.tolist()[0]
+
+    transformed_vertex = [
+      (transformed_vertex[0]/transformed_vertex[3]),
+      (transformed_vertex[1]/transformed_vertex[3]),
+      (transformed_vertex[2]/transformed_vertex[3])
+    ]
+
+    return  V3(*transformed_vertex)
+
     
-  def load(self, filename, translate, scale):
+  def load(self, filename, translate, scale, rotate):
+    self.loadModelMatrix(translate, scale, rotate)
     model = Obj(filename)
     vertex_buffer_object = []
 
     for face in model.vfaces:
         for v in range(len(face)):
-            vertex = self.transform(model.vertices[face[v][0] - 1], translate, scale)
+            vertex = self.transform(model.vertices[face[v][0] - 1])
             vertex_buffer_object.append(vertex)
 
         if self.current_texture:
@@ -132,8 +150,100 @@ class Renderer(object):
                 tvertex = V3(*model.tvertices[face[v][1] - 1])
                 vertex_buffer_object.append(tvertex)
 
+        for v in range(len(face)):
+            normal = norm(V3(*model.normals[face[v][2]]  ))
+            vertex_buffer_object.append(normal)
+
     self.active_vertex_array = iter(vertex_buffer_object)
 
+  def loadModelMatrix(self, translate, scale, rotate=(0,0,0)):
+    translate = V3(*translate)
+    scale = V3(*scale)
+    rotate = V3(*rotate)
+
+    translation_matrix = createMatrix(4,4,
+      [1, 0, 0, translate.x,
+      0, 1, 0, translate.y,
+      0, 0, 1, translate.z,
+      0, 0, 0, 1]
+    )
+
+    angle = rotate.x
+    rotation_matrix_x = createMatrix(4,4,
+      [1, 0, 0, 0,
+      0, cos(angle), -sin(angle), 0,
+      0, sin(angle), cos(angle), 0,
+      0, 0, 0, 1]
+    )
+    angle = rotate.y
+    rotation_matrix_y = createMatrix(4,4,
+      [cos(angle), 0, sin(angle), 0,
+      0, 1, 0, 0,
+      -sin(angle), 0, cos(angle), 0,
+      0, 0, 0, 1]
+    )
+    angle = rotate.z
+    rotation_matrix_z = createMatrix(4,4,
+      [cos(angle), -sin(angle), 0, 0,
+      sin(angle), cos(angle), 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1]
+    )
+    
+    rotation_matrix = matrix_multiply(rotation_matrix_x, matrix_multiply( rotation_matrix_y , rotation_matrix_z))
+
+    scale_matrix =  createMatrix(4,4,
+      [scale.x, 0, 0, 0,
+      0, scale.y, 0, 0,
+      0, 0, scale.z, 0,
+      0, 0, 0, 1]
+    )
+
+    self.Model = matrix_multiply(translation_matrix, matrix_multiply( rotation_matrix , scale_matrix))
+
+  def loadViewMatrix(self, x, y, z, center):
+    M = createMatrix(4,4,
+      [x.x, x.y, x.z, 0,
+      y.x, y.y, y.z, 0,
+      z.x, z.y, z.z, 0,
+      0, 0, 0, 1]
+    )
+
+    O = createMatrix(4,4,
+      [1, 0, 0, -center.x,
+      0, 1, 0, -center.y,
+      0, 0, 1, -center.z,
+      0, 0, 0, 1]
+    )
+
+    self.View = matrix_multiply(M ,O)
+  def loadProjectionMatrix(self, coeff):
+    # coeff para hacer pequeños a los objectos que estan lejos
+    self.Projection = createMatrix(4,4,
+      [1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, coeff, 1]
+    )
+
+  def loadViewportMatrix(self, x = 0, y = 0):
+    self.Viewport = createMatrix(4,4,
+      [self.width/2, 0, 0, x + self.width/2,
+      0, self.height/2, 0, y + self.height/2,
+      0, 0, 1, 0,
+      0, 0, 0, 1]
+    )
+
+  def lookAt(self, eye, center, up):
+    #up es orientacion de la camara
+    z = norm(sub(eye, center))
+    x = norm(cross(up,z))
+    y = norm(cross(z,x))
+
+
+    self.loadViewMatrix(x, y, z, center)
+    self.loadProjectionMatrix(-1/length(sub(eye,center)))
+    self.loadViewportMatrix(0,0)
 
   def draw_arrays(self, polygon):
     if polygon == 'WIREFRAME':
@@ -145,9 +255,3 @@ class Renderer(object):
       except StopIteration:
           print('Done')
 
-
-# r = Renderer(800,600)
-# r.current_texture = Texture('./VertexBuffer/models/earth.bmp')
-# r.load('./VertexBuffer/models/earth.obj',(1, 1, 1), (300, 300, 300))
-# r.draw_arrays('TRIANGLES')
-# r.display()
