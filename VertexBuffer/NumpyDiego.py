@@ -25,13 +25,25 @@ def zeros_matrix(rows, cols):
  
     return M
 
+def matrix_vector_multiply(A, B):
+    rowsV = len(B)
+    colsM = len(A)
+    F = [0,0,0,0]
+
+    for i in range(rowsV):
+        res = 0
+        for j in range(colsM):
+            res += A[i][j] * B[j] 
+        F[i] = res
+
+    return F
+
 def matrix_multiply(A, B):
 
     rowsA = len(A)
     colsA = len(A[0])
     colsB = len(B[0])
 
-    # Section 2: Store matrix multiplication in a new matrix
     C = zeros_matrix(rowsA, colsB)
     for i in range(rowsA):
         for j in range(colsB):
@@ -41,3 +53,14 @@ def matrix_multiply(A, B):
             C[i][j] = total
  
     return C
+
+# matrix_vector_multiply(
+#     [
+#         [1,1,1,1],
+#         [1,1,1,1],
+#         [1,1,1,1],
+#         [1,1,1,1]
+
+#     ], [2,0,0,3]
+
+# )

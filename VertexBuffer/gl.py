@@ -99,7 +99,6 @@ class Renderer(object):
           tx = tA.x * w + tB.x * v + tC.x * u
           ty = tA.y * w + tB.y * v + tC.y * u
           
-          fcolor = self.current_texture.get_color(tx,ty)
           col = self.active_shader(self, triangle=(A,B,C), bar=(w,v,u), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
         else:
           col = WHITE * 1
@@ -119,12 +118,11 @@ class Renderer(object):
     augmented_vertex = [
       vertex[0],
       vertex[1],
-      vertex[2]
+      vertex[2], 
+      0 
     ]
-  # multiplicar un array por matriz https://integratedmlai.com/basic-linear-algebra-tools-in-pure-python-without-numpy-or-scipy/
-    transformed_vertex = matrix_multiply( self.Viewport, matrix_multiply( self.Projection, matrix_multiply(self.View, matrix_multiply( self.Model, augmented_vertex))))
-
-    transformed_vertex = transformed_vertex.tolist()[0]
+  
+    transformed_vertex = matrix_vector_multiply( self.Viewport, matrix_vector_multiply( self.Projection, matrix_vector_multiply(self.View, matrix_vector_multiply( self.Model, augmented_vertex))))
 
     transformed_vertex = [
       (transformed_vertex[0]/transformed_vertex[3]),
@@ -151,7 +149,7 @@ class Renderer(object):
                 vertex_buffer_object.append(tvertex)
 
         for v in range(len(face)):
-            normal = norm(V3(*model.normals[face[v][2]]  ))
+            normal = norm(V3(*model.normals[face[v][2] - 1]))
             vertex_buffer_object.append(normal)
 
     self.active_vertex_array = iter(vertex_buffer_object)
