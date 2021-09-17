@@ -95,20 +95,23 @@ def bbox(*vertices):
   return V3(round(xs[0]), round(ys[0])), V3(round(xs[-1]), round(ys[-1]))
 
 def barycentric(A, B, C, P):
-   
-  bary = cross(
-    V3(C.x - A.x, B.x - A.x, A.x - P.x), 
-    V3(C.y - A.y, B.y - A.y, A.y - P.y)
+  
+  vectors = cross( 
+    V3(B.x - A.x, C.x - A.x, A.x - P.x ),
+    V3(B.y - A.y, C.y - A.y, A.y - P.y )
   )
+  
+  cx, cy, cz = vectors.__getitem__(0), vectors.__getitem__(1), vectors.__getitem__(2)
 
-  if abs(bary[2]) < 1:
-    return -1, -1, -1   # this triangle is degenerate, return anything outside
+  if abs(cz) < 1:
+    return -1, -1, -1
 
-  return (
-    1 - (bary[0] + bary[1]) / bary[2], 
-    bary[1] / bary[2], 
-    bary[0] / bary[2]
-  )
+  u = cx / cz 
+  v = cy / cz
+  w = 1 - (cx + cy) / cz 
+
+  return w, v, u
+
 
 
 # ===============================================================

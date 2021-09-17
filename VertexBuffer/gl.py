@@ -58,7 +58,7 @@ class Renderer(object):
 
     f.close()
 
-  def display(self, filename='out.bmp'):
+  def display(self, filename='aiuda.bmp'):
     self.write(filename)
 
   def set_color(self, color):
@@ -98,8 +98,8 @@ class Renderer(object):
         if self.current_texture:
           tx = tA.x * w + tB.x * v + tC.x * u
           ty = tA.y * w + tB.y * v + tC.y * u
-          
-          col = self.active_shader(self, triangle=(A,B,C), bar=(w,v,u), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
+          # triangle(A,B,C)
+          col = self.active_shader(self, bar=(w,v,u), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
         else:
           col = WHITE * 1
 

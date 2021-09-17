@@ -54,6 +54,22 @@ def matrix_multiply(A, B):
  
     return C
 
+def matrix_multiply_list(arrayMatrix):
+    matriz1 = arrayMatrix[0]
+
+    for matrix in arrayMatrix[1:]:
+        matrix_result = matrix_multiply(matriz1, matrix)
+ 
+    return matrix_result
+
+def vector_multiply_list(arrayMatrix):
+    matriz1 = arrayMatrix[0]
+
+    for matrix in arrayMatrix[1:]:
+        matrix_result = matrix_vector_multiply(matriz1, matrix)
+ 
+    return matrix_result
+
 # matrix_vector_multiply(
 #     [
 #         [1,1,1,1],

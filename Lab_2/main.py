@@ -133,6 +133,9 @@ class Renderer(object):
     if (x > 590):
       lineX, lineY = self.square(595,580,340,320)
       self.line(lineX, lineY,x_center,y_center, color(120,74,38))
+    if (x < 590 and x > 400):
+      lineX, lineY = self.square(505,488,420,442)
+      self.line(lineX, lineY,x_center,y_center, color(120,74,38))
 
     if (x * random.randint(0,3) - x_center )**2 + (y * random.randint(0,3)< - y_center )**2   > (radius**2 ):
       self.point(x,y ,color(200,200,200))
