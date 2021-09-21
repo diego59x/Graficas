@@ -94,12 +94,17 @@ class Renderer(object):
         w, v, u = barycentric(A, B, C, V3(x, y))
         if w < 0 or v < 0 or u < 0:  # 0 is actually a valid value! (it is on the edge)
           continue
-        
+        # w v u nel
+        # w u v casi 
+        # v u w nel
+        # v w u nel
+        # u w v
+        # u v w
         if self.current_texture:
-          tx = tA.x * w + tB.x * v + tC.x * u
-          ty = tA.y * w + tB.y * v + tC.y * u
+          tx = tA.x * w + tB.x * u + tC.x * v
+          ty = tA.y * w + tB.y * u + tC.y * v
           # triangle(A,B,C)
-          col = self.active_shader(self, bar=(w,v,u), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
+          col = self.active_shader(self, bar=(w,u,v), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
         else:
           col = WHITE * 1
 
@@ -119,7 +124,7 @@ class Renderer(object):
       vertex[0],
       vertex[1],
       vertex[2], 
-      0 
+      1 
     ]
   
     transformed_vertex = matrix_vector_multiply( self.Viewport, matrix_vector_multiply( self.Projection, matrix_vector_multiply(self.View, matrix_vector_multiply( self.Model, augmented_vertex))))
