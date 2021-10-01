@@ -94,12 +94,7 @@ class Renderer(object):
         w, v, u = barycentric(A, B, C, V3(x, y))
         if w < 0 or v < 0 or u < 0:  # 0 is actually a valid value! (it is on the edge)
           continue
-        # w v u nel
-        # w u v casi 
-        # v u w nel
-        # v w u nel
-        # u w v
-        # u v w
+
         if self.current_texture:
           tx = tA.x * w + tB.x * u + tC.x * v
           ty = tA.y * w + tB.y * u + tC.y * v
@@ -107,9 +102,16 @@ class Renderer(object):
           col = self.active_shader(self, bar=(w,u,v), tex_coords=(tx,ty), varyin_normals=(nA,nB,nC) )
         else:
           col = WHITE * 1
+        z = 0
+        if A.z == None:
+          A.z = 0
+        if B.z == None: 
+          B.z = 0
+        if C.z == None:
+          C.z = 0
 
-        z = A.z * w + B.z * v + C.z * u
-
+        z = A.z * w + B.z * u + C.z * v
+        
         if x < 0 or y < 0:
           continue
 
@@ -249,9 +251,7 @@ class Renderer(object):
     self.loadViewportMatrix(0,0)
 
   def draw_arrays(self, polygon):
-    if polygon == 'WIREFRAME':
-      pass
-    elif polygon == 'TRIANGLES':
+    if polygon == 'TRIANGLES':
       try:
         while True:
           self.triangle()
