@@ -51,10 +51,11 @@ class color(object):
         return bytes([b,g,r])
 
 class Material(object):
-  def __init__(self, diffuse, albedo, specular):
+  def __init__(self, diffuse, albedo, specular, refractive_index = 0):
     self.albedo = albedo
     self.diffuse = diffuse
     self.specular = specular
+    self.refractive_index = refractive_index
 
   def __repr__(self):
     return 'Diffuse: ' + self.diffuse
@@ -71,8 +72,30 @@ class Light(object):
     self.intensity = intensity
     self.color = color
 
-def reflect(I,N):
+def reflect(I, N):
   return norm(sub(I, mul(N, 2 * (dot(I, N)))))
+  
+def refract(I, N, refractive_index):
+  cos_i = -max(-1, min(1, dot(I, N)))
+  eta_i = 1
+  eta_t = refractive_index
+
+  if cos_i < 0: 
+    cos_i = -cos_i
+    eta_i, eta_t = eta_t, eta_i
+    N = mul(N, -1)
+  
+  eta = eta_i/eta_t
+
+  k = 1 - eta**2 * (1 - cos_i**2)
+  if k < 0:
+    return None
+
+  return  norm(sum(
+    mul(I, eta),
+    mul(N, (eta * cos_i) + k**(1/2))
+  ))
+
 
 def sum(v0, v1):
   return V3(v0.x + v1.x, v0.y + v1.y, v0.z + v1.z)
