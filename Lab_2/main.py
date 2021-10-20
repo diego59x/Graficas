@@ -4,18 +4,13 @@ from lib import *
 import random
 from collections import namedtuple
 
-# ===============================================================
-# Math
-# ===============================================================
-
-
 class Renderer(object):
   def __init__(self, width, height):
     self.width = width
     self.height = height
     self.current_color = WHITE
     self.current_texture = None
-    self.light = V3(0,0,1)
+    self.light = V3(0,0,3)
     self.clear()
 
   def clear(self):
@@ -58,7 +53,7 @@ class Renderer(object):
 
     f.close()
 
-  def display(self, filename='out.bmp'):
+  def display(self, filename='planet.bmp'):
     self.write(filename)
 
   def set_color(self, color):
@@ -103,11 +98,9 @@ class Renderer(object):
       r.point(*point,color)
 
   def point(self, x, y, color = None):
-    # 0,0 was intentionally left in the bottom left corner to mimic opengl
     try:
       self.pixels[y][x] = color or self.current_color
     except:
-      # To avoid index out of range exceptions
       pass
 
   def shader(self,x,y):
@@ -130,12 +123,31 @@ class Renderer(object):
     if (x - 300 )**2 + (y  - 300 )**2   < (20**2 ):
       self.line(x,y,(300+random.randint(-40,30)),300+random.randint(-40,90),color(120,74,38))
       return color(120,74,38)
+    # Lineas 
     if (x > 590):
       lineX, lineY = self.square(595,580,340,320)
       self.line(lineX, lineY,x_center,y_center, color(120,74,38))
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
     if (x < 590 and x > 400):
       lineX, lineY = self.square(505,488,420,442)
       self.line(lineX, lineY,x_center,y_center, color(120,74,38))
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+    if (x < 540 and x > 400):
+      lineX, lineY = self.square(402,260,401,502)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+    if x < x_center and y > y_center:
+      lineX, lineY = self.square(212, 347, 209, 348)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+      lineX, lineY = self.square(230, 401, 229, 402)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+      lineX, lineY = self.square(211, 347, 211, 349)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+      lineX, lineY = self.square(228, 398, 226, 395)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+      lineX, lineY = self.square(227, 395, 227, 398)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
+      lineX, lineY = self.square(209, 347, 235, 413)
+      self.line(lineX, lineY,x_centerDown,y_centerDown, color(120,74,38))
 
     if (x * random.randint(0,3) - x_center )**2 + (y * random.randint(0,3)< - y_center )**2   > (radius**2 ):
       self.point(x,y ,color(200,200,200))
@@ -159,7 +171,8 @@ class Renderer(object):
     A = next(self.active_vertex_array)
     B = next(self.active_vertex_array)
     C = next(self.active_vertex_array)
-
+    x_center , y_center = 405, 310
+    radiusPoint = 180
     bbox_min, bbox_max = bbox(A, B, C)
 
     normal = norm(cross(sub(B, A), sub(C, A)))
@@ -171,7 +184,10 @@ class Renderer(object):
         if w < 0 or v < 0 or u < 0: 
           continue
         
-        col = self.shader(x,y)# *intensity
+        if (x - x_center )**2 + (y  - y_center )**2 > (radiusPoint**2 ):
+          col = self.shader(x,y) * intensity
+        else:
+          col = self.shader(x,y)
 
         z = A.z * w + B.z * v + C.z * u
 
