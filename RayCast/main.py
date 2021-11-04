@@ -1,5 +1,7 @@
 from lib import * 
 from sphere import *
+from plane import *
+from floor import *
 from random import random
 from math import pi, tan
 
@@ -83,8 +85,6 @@ class Raytracer(object):
         reflection = reflect_color * material.albedo[2]
         refraction = refract_color * material.albedo[3]
 
-
-
         c = diffuse + specular + reflection + refraction
 
         return c
@@ -111,7 +111,7 @@ class Raytracer(object):
         aspectRatio = self.width/self.height
         for x in range(self.height):
             for y in range(self.width):
-                if random() > 0:
+                if random() > 0.8:
                     i = (2 * ((x + 0.5) / self.width) - 1) * aspectRatio * tan(fov / 2)
                     j = 1 - 2 * ((y + 0.5) / self.height) * tan(fov / 2)
                     direction = norm(V3(i,j,-1))
@@ -120,19 +120,28 @@ class Raytracer(object):
 
 r = Raytracer(1000, 1000)
 
-r.light = Light(position=V3(10, 10, 20), intensity=2, color = color(255,255,200))
+r.light = Light(position=V3(10, 10, 20), intensity=4, color = color(255,255,200))
 
 ivory = Material(diffuse=color(100,100,100), albedo=[0.6, 0.3, 0.1, 0], specular=50)
 rubber = Material(diffuse=color(80,0,0), albedo=[0.9, 0.1, 0.0, 0], specular=10)
 mirror = Material(diffuse=color(255,255,255), albedo=[0, 10, 0.8, 0], specular=1500)
 glass = Material(diffuse=color(255,255,255), albedo=[0, 0.5, 0.1, 0.8], specular=150, refractive_index  = 1.5)
 
-
+""" 
+    Floor(x, y, material) Y: height x: width
+    Plane(xmin, xmax, ymin, ymax, ztotal, z1, z2, z3, material)
+    Eje y positivo hacia arriba 
+    Eje Z positivo hacia dentro de la pantalla 
+    V3(-1,1,0), V3(-1,-1,0), V3(1,-1,0), V3(1,1,0)
+"""
 r.scene = [ 
-    Sphere(V3(0, -1.5, -10), 1.5, ivory),
-    Sphere(V3(-2, 1, -5), 10, glass),
-    Sphere(V3(1, 1, -8), 1.7, rubber),
-    Sphere(V3(0, 5, -20), 5, mirror),
+    # Sphere(V3(0, -1.5, -10), 1.5, ivory),
+    # Sphere(V3(-2, 1, -5), 10, glass),
+    # Sphere(V3(1, 1, -8), 1.7, rubber),
+    # Sphere(V3(0, 5, -20), 5, mirror),
+    # Floor(20, 5, ivory),
+    # Floor(20, -5, rubber),
+    Plane(V3(-3,1,0), V3(-1,-3,0), V3(1,-1,0), V3(1,2,0), ztotal = -17, material = rubber)
 ]
 
 
