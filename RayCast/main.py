@@ -120,26 +120,26 @@ class Raytracer(object):
 
 r = Raytracer(1000, 1000)
 
-r.light = Light(position=V3(-45, 10, 20), intensity=4, color = color(255,255,200))
+r.light = Light(position=V3(-15, 10, 20), intensity=4, color = color(255,255,200))
 
 ivory = Material(diffuse=color(100,100,100), albedo=[0.6, 0.3, 0.1, 0], specular=50, refractive_index  = 1.5)
 rubber = Material(diffuse=color(80,0,0), albedo=[0.9, 0.1, 0.0, 0], specular=10)
 mirror = Material(diffuse=color(255,255,255), albedo=[0, 10, 0.8, 0], specular=1500)
 glass = Material(diffuse=color(255,255,255), albedo=[0, 0.5, 0.1, 0.8], specular=150, refractive_index  = 1.5)
 
-""" 
-    Eje y positivo hacia abajo 
+"""
+    Eje x positivo hacia la derecha
+    Eje y positivo hacia abajo
     Eje Z positivo hacia fuera de la pantalla 
     Plane() Needs 4 points, the z total of the figure and the material
     Floor() Needs x initial and x final, y for position, z initial and z final
 """
 r.scene = [
-    Floor(-7, 7, -5, -5, -25, ivory),
-    Floor(-6, 0, -2, 0, -6, rubber),
-    # Floor(20, -6, rubber),
-    Plane(V3(-8,2,-5), V3(-9,2,2), V3(-1,2,6), V3(-2,2,-5), ztotal = -17, material = ivory)
-    # Plane(V3(-1,2,-3), V3(-1,1,-1), V3(1,1,-1), V3(1,2,-3), ztotal = -15, material = rubber),
-    # Plane(V3(-1,1,0), V3(-1,-1,0), V3(1,-1,0), V3(1,1,0), ztotal = -12, material = ivory)
+    # Floor(-7, 7, -5, -5, -25, ivory),
+    # Floor(-5, 0, -2, 0, -6, rubber),
+    # Plane(V3(-1,1,-3), V3(-1,-1,-5), V3(1,-1,-5), V3(1,1,-3), material = rubber),
+    # Plane(V3(-1,1,-3), V3(-1,-1,-4), V3(1,-1,-4), V3(1,1,-3), material = ivory)
+    Plane(V3(-1,-1,-7), V3(-1,0.5,-6), V3(1,0.5,-6), V3(1,-1,-7), material = ivory)
 ]
 
 r.render()

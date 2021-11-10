@@ -3,12 +3,11 @@ from lib import *
 
 epsilon = 1e-6
 class Plane(object):
-    def __init__(self, corner1, corner2, corner3, corner4, ztotal, material, nOptional = None):
-        self.corner1 = corner1
-        self.corner2 = corner2
-        self.corner3 = corner3
-        self.corner4 = corner4
-        self.ztotal = ztotal
+    def __init__(self, corner1, corner2, corner3, corner4, material, nOptional = None):
+        self.corner1 = corner2
+        self.corner2 = corner1
+        self.corner3 = corner4
+        self.corner4 = corner3
         self.material = material
         self.nOptional = nOptional
         self.CaclculateConstants()
@@ -29,8 +28,7 @@ class Plane(object):
             else:
                 return None
     def CaclculateConstants(self): 
-        self.p0 = V3((self.corner1.x + self.corner4.x)/2, (self.corner2.y + self.corner3.y)/2, self.ztotal)
-
+        self.p0 = V3((self.corner1.x + self.corner4.x)/2, (self.corner2.y + self.corner3.y)/2, (self.corner1.z + self.corner3.z)/2 )
         if (self.nOptional != None):
             self.n = self.nOptional
         else:
