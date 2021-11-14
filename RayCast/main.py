@@ -111,7 +111,7 @@ class Raytracer(object):
         aspectRatio = self.width/self.height
         for x in range(self.height):
             for y in range(self.width):
-                if random() > 0.8:
+                if random() > 0:
                     i = (2 * ((x + 0.5) / self.width) - 1) * aspectRatio * tan(fov / 2)
                     j = 1 - 2 * ((y + 0.5) / self.height) * tan(fov / 2)
                     direction = norm(V3(i,j,-1))
@@ -135,9 +135,10 @@ glass = Material(diffuse=color(255,255,255), albedo=[0, 0.5, 0.1, 0.8], specular
     Floor() Needs x initial and x final, y for position, z initial and z final
 """
 r.scene = [
-    # Floor(-7, 7, -5, -5, -30, ivory),
-    # Floor(-5, 0, -2, 0, -6, rubber),
-    Plane(V3(-1,2,-7), V3(-2,-5,-6), V3(2,-2,-6), V3(3,2,-7), material = ivory)
+    Floor(-7, 7, -5, -5, -30, ivory),
+    Floor(-5, 0, -2, 0, -6, rubber),
+    Plane(V3(-7,2,-5), V3(-7,-2.5,-5), V3(-3.1,-2.5,-15), V3(-3,2,-16), material = ivory),
+    Plane(V3(3.1,2,-15), V3(3,-2.5,-17), V3(7,-2.5,-5), V3(7,2,-5), material = ivory)
 ]
 
 r.render()
