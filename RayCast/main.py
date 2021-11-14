@@ -111,7 +111,7 @@ class Raytracer(object):
         aspectRatio = self.width/self.height
         for x in range(self.height):
             for y in range(self.width):
-                if random() > 0:
+                if random() > 0.8:
                     i = (2 * ((x + 0.5) / self.width) - 1) * aspectRatio * tan(fov / 2)
                     j = 1 - 2 * ((y + 0.5) / self.height) * tan(fov / 2)
                     direction = norm(V3(i,j,-1))
@@ -131,15 +131,13 @@ glass = Material(diffuse=color(255,255,255), albedo=[0, 0.5, 0.1, 0.8], specular
     Eje x positivo hacia la derecha
     Eje y positivo hacia abajo
     Eje Z positivo hacia fuera de la pantalla 
-    Plane() Needs 4 points, the z total of the figure and the material
+    Plane() Needs 4 points and the material
     Floor() Needs x initial and x final, y for position, z initial and z final
 """
 r.scene = [
-    # Floor(-7, 7, -5, -5, -25, ivory),
+    # Floor(-7, 7, -5, -5, -30, ivory),
     # Floor(-5, 0, -2, 0, -6, rubber),
-    # Plane(V3(-1,1,-3), V3(-1,-1,-5), V3(1,-1,-5), V3(1,1,-3), material = rubber),
-    # Plane(V3(-1,1,-3), V3(-1,-1,-4), V3(1,-1,-4), V3(1,1,-3), material = ivory)
-    Plane(V3(-1,-1,-7), V3(-1,0.5,-6), V3(1,0.5,-6), V3(1,-1,-7), material = ivory)
+    Plane(V3(-1,2,-7), V3(-2,-5,-6), V3(2,-2,-6), V3(3,2,-7), material = ivory)
 ]
 
 r.render()

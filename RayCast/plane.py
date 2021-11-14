@@ -4,10 +4,10 @@ from lib import *
 epsilon = 1e-6
 class Plane(object):
     def __init__(self, corner1, corner2, corner3, corner4, material, nOptional = None):
-        self.corner1 = corner2
-        self.corner2 = corner1
-        self.corner3 = corner4
-        self.corner4 = corner3
+        self.corner1 = corner1
+        self.corner2 = corner2
+        self.corner3 = corner3
+        self.corner4 = corner4
         self.material = material
         self.nOptional = nOptional
         self.CaclculateConstants()
@@ -19,8 +19,9 @@ class Plane(object):
             t = -dot(self.n, p0l0) / denom
 
             point = sum(origin, mul(direction, t))
-
-            if (t >= 0):
+            #print("diferente de cero???? ",point)
+            if (t >= 0): # 
+                #print("aqui no ",point)
                 if (self.lineDown(point) == True and self.lineUp(point) == True and self.lineLeft(point) == True and self.lineRight(point) == True):
                     return Intersect(distance=t, normal=self.n, point=point)
                 else:
@@ -43,17 +44,21 @@ class Plane(object):
         self.bUp = 0
         self.bDown = 0
 
-        if (self.corner2.x - self.corner1.x != 0):
-            self.mLeft = (self.corner2.y - self.corner1.y)/(self.corner2.x - self.corner1.x)
+        if (self.corner1.x - self.corner2.x != 0):
+            if (abs(self.corner1.x) != abs(self.corner2.x)):
+                self.mLeft = (self.corner2.y - self.corner1.y)/(self.corner2.x - self.corner1.x)
         
         if (self.corner3.x - self.corner4.x != 0):
-            self.mRight = (self.corner3.y - self.corner4.y)/(self.corner3.x - self.corner4.x)
+            if (abs(self.corner3.x) != abs(self.corner4.x)):
+                self.mRight = (self.corner3.y - self.corner4.y)/(self.corner3.x - self.corner4.x)
         
         if (self.corner4.x - self.corner1.x != 0):
-            self.mUp = (self.corner4.y - self.corner1.y)/(self.corner4.x - self.corner1.x)
+            if (abs(self.corner4.y) != abs(self.corner1.y)):
+                self.mUp = (self.corner4.y - self.corner1.y)/(self.corner4.x - self.corner1.x)
 
-        if (self.corner3.x - self.corner2.x != 0):
-            self.mDown = (self.corner3.y - self.corner2.y)/(self.corner3.x - self.corner2.x)
+        if (self.corner2.x - self.corner3.x != 0):
+            if (abs(self.corner2.y) != abs(self.corner3.y)):
+                self.mDown = (self.corner3.y - self.corner2.y)/(self.corner3.x - self.corner2.x)
         
         self.bUp = self.corner4.y - self.mUp*self.corner4.x 
         self.bDown = self.corner3.y - self.mDown*self.corner3.x 
@@ -74,7 +79,7 @@ class Plane(object):
             else:
                 return False
         else:
-            if (point.y >= -point.x*self.mRight - self.bRight ):
+            if (point.x <= (-point.y - self.bRight)/self.mRight ):
                 return True
             else:
                 return False
@@ -86,7 +91,7 @@ class Plane(object):
             else:
                 return False
         else:
-            if (point.y <= -point.x*self.mLeft - self.bLeft ):
+            if (point.x >= (-point.y - self.bLeft)/self.mLeft ):
                 return True
             else:
                 return False
