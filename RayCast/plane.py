@@ -19,9 +19,7 @@ class Plane(object):
             t = -dot(self.n, p0l0) / denom
 
             point = sum(origin, mul(direction, t))
-            #print("diferente de cero???? ",point)
-            if (t >= 0): # 
-                #print("aqui no ",point)
+            if (t >= 0):
                 if (self.lineDown(point) == True and self.lineUp(point) == True and self.lineLeft(point) == True and self.lineRight(point) == True):
                     return Intersect(distance=t, normal=self.n, point=point)
                 else:

@@ -120,25 +120,40 @@ class Raytracer(object):
 
 r = Raytracer(1000, 1000)
 
-r.light = Light(position=V3(-15, 10, 20), intensity=4, color = color(255,255,200))
+r.light = Light(position=V3(-60, 10, 20), intensity=10, color = color(243,159,24))
 
-ivory = Material(diffuse=color(100,100,100), albedo=[0.6, 0.3, 0.1, 0], specular=50, refractive_index  = 1.5)
-rubber = Material(diffuse=color(80,0,0), albedo=[0.9, 0.1, 0.0, 0], specular=10)
+ivory = Material(diffuse=color(100,100,100), albedo=[0.6, 0.3, 0.1, 0], specular=50)
+sky = Material(diffuse=color(0,0,100), albedo=[0.6, 0.3, 0.1, 0], specular=50)
+blocks = Material(diffuse=color(94,33,41), albedo=[0.1, 0.1, 0.0, 0], specular=10)
+grass = Material(diffuse=color(0,80,0), albedo=[0.9, 0.1, 0.0, 0], specular=10)
+wood = Material(diffuse=color(75,54,33), albedo=[0.9, 0.1, 0.0, 0], specular=10)
 mirror = Material(diffuse=color(255,255,255), albedo=[0, 10, 0.8, 0], specular=1500)
 glass = Material(diffuse=color(255,255,255), albedo=[0, 0.5, 0.1, 0.8], specular=150, refractive_index  = 1.5)
 
 """
     Eje x positivo hacia la derecha
-    Eje y positivo hacia abajo
+    Eje y positivo hacia arriba
     Eje Z positivo hacia fuera de la pantalla 
     Plane() Needs 4 points and the material
     Floor() Needs x initial and x final, y for position, z initial and z final
 """
 r.scene = [
     Floor(-7, 7, -5, -5, -30, ivory),
-    Floor(-5, 0, -2, 0, -6, rubber),
-    Plane(V3(-7,2,-5), V3(-7,-2.5,-5), V3(-3.1,-2.5,-15), V3(-3,2,-16), material = ivory),
-    Plane(V3(3.1,2,-15), V3(3,-2.5,-17), V3(7,-2.5,-5), V3(7,2,-5), material = ivory)
+    Floor(7, 20, -5, -5, -20, grass),
+    Floor(-20, -7, -5, -5, -20, grass),
+    Plane(V3(-3.2,7,-13), V3(-3.1,-2.1,-13), V3(3.1,-2.1,-13), V3(3.2,7,-13), material = wood), # Door
+    #Plane(V3(-3.2,7,-10), V3(-3.1,-2.1,-10), V3(3.1,-2.1,-10), V3(3.2,7,-10), material = glass), # Door
+    
+    Plane(V3(-3.2,5.8,-10), V3(-3.3,-2.4,-10), V3(-3,-2.1,-13), V3(-3.1,6.6,-13), material = blocks), # Wall Border Left
+    Plane(V3(-10.8,6.2,-15), V3(-17,-4.1,-10), V3(-5.9,-4.1,-10), V3(-3.3,6.2,-15), material = ivory),# Wall Left
+
+    Plane(V3(3.1,6.6,-13), V3(3,-2.1,-13), V3(3.3 ,-2.4,-10), V3(3.2,5.8,-10), material = blocks), # Wall Border Right
+    Plane(V3(3.4,6.2,-15), V3(5.5,-4.1,-10), V3(17,-4.1,-10), V3(10.8,6.2,-15), material = ivory), # Wall Right
+
+    Plane(V3(-10.1,6.5,-10), V3(-10,5,-10), V3(10,5,-10), V3(10.1,6.5,-10), material = blocks), # Roof
+    Plane(V3(-9,16,-15), V3(-10,5,-10), V3(10,5,-10), V3(9,16,-15), material = sky) # Roof 2
+    # Plane(V3(-7,2,-5), V3(-7,-2.5,-5), V3(-3.1,-2.5,-15), V3(-3,2,-16), material = ivory),
+    # Plane(V3(3.1,2,-15), V3(3,-2.5,-17), V3(7,-2.5,-5), V3(7,2,-5), material = ivory)
 ]
 
 r.render()
