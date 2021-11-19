@@ -6,6 +6,8 @@ from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 import glm
 
+print(glm.__version__)
+
 pygame.init()
 screen = pygame.display.set_mode((1200, 720), pygame.OPENGL | pygame.DOUBLEBUF)
 glClearColor(0.1, 0.2, 0.5, 1.0)
