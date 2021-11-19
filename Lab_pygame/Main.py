@@ -1,7 +1,7 @@
 # import sys 
 # sys.path.insert(0, "C:\Python39\Lib\site - packages")
 # import site
-
+# Diego Alvarez
 # print(site.getsitepackages())
 import pygame 
 import time
@@ -24,8 +24,13 @@ class Life(object):
 
     def pixel(self, x, y, color = WHITE):
         self.screen.set_at((x, y), color)
+    
+    def randomPoints(self):
+        for i in range(0, 2400):
+            self.pixel(random.randint(0, 490), random.randint(0, 490))
 
     def initValues(self):
+        self.randomPoints()
         self.toad()
         self.strange()
         self.cross()
@@ -160,7 +165,7 @@ class Life(object):
     def checkNewShape(self):
         for x in range(10, self.width  -  10):
             for y in range(10, self.height  -  10):
-                
+
                 cellAside = 0
 
                 if self.prev_turn[x][y + 1] == 16777215:
