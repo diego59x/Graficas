@@ -2,6 +2,7 @@ from lib import *
 from sphere import *
 from plane import *
 from floor import *
+from obj import Texture
 from random import random
 from math import pi, tan
 
@@ -12,6 +13,8 @@ class Raytracer(object):
         self.width = width
         self.height = height
         self.light = None
+        self.texture = Texture('./RayCast/door.bmp')
+        self.texture.read()
         self.clear()
         self.background_color = BLACK
 
@@ -29,7 +32,11 @@ class Raytracer(object):
         material, intersect = self.scene_intersect(origin, direction)
 
         if material is None or recursion >= MAX_RECURSION_DEPTH:
-            return self.background_color
+            if (self.texture):
+                norm_direction = norm(direction)
+                return self.texture.get_color(norm_direction.x, norm_direction.y, norm_direction.z)
+            else:
+                return self.background_color
 
         light_dir = norm(sub(self.light.position, intersect.point))
         light_distance = length(sub(self.light.position, intersect.point))
@@ -120,7 +127,7 @@ class Raytracer(object):
 
 r = Raytracer(1000, 1000)
 
-r.light = Light(position=V3(-60, 10, 20), intensity=10, color = color(243,159,24))
+r.light = Light(position=V3(0, 10, 20), intensity=10, color = color(243,159,24))
 
 ivory = Material(diffuse=color(100,100,100), albedo=[0.6, 0.3, 0.1, 0], specular=50)
 sky = Material(diffuse=color(0,0,100), albedo=[0.6, 0.3, 0.1, 0], specular=50)
@@ -141,8 +148,8 @@ r.scene = [
     Floor(-7, 7, -5, -5, -30, ivory),
     Floor(7, 20, -5, -5, -20, grass),
     Floor(-20, -7, -5, -5, -20, grass),
-    Plane(V3(-3.2,7,-13), V3(-3.1,-2.1,-13), V3(3.1,-2.1,-13), V3(3.2,7,-13), material = wood), # Door
-    #Plane(V3(-3.2,7,-10), V3(-3.1,-2.1,-10), V3(3.1,-2.1,-10), V3(3.2,7,-10), material = glass), # Door
+    # Plane(V3(-3.2,7,-13), V3(-3.1,-2.1,-13), V3(3.1,-2.1,-13), V3(3.2,7,-13), material = wood), # Door
+    # Plane(V3(-3.2,7,-10), V3(-3.1,-2.1,-10), V3(3.1,-2.1,-10), V3(3.2,7,-10), material = glass), # Door
     
     Plane(V3(-3.2,5.8,-10), V3(-3.3,-2.4,-10), V3(-3,-2.1,-13), V3(-3.1,6.6,-13), material = blocks), # Wall Border Left
     Plane(V3(-10.8,6.2,-15), V3(-17,-4.1,-10), V3(-5.9,-4.1,-10), V3(-3.3,6.2,-15), material = ivory),# Wall Left
@@ -157,4 +164,4 @@ r.scene = [
 ]
 
 r.render()
-r.write("r.bmp")
+r.write("rayCast.bmp")
