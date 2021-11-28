@@ -17,44 +17,21 @@ glClearColor(0.1, 0.2, 0.5, 1.0)
 glEnable(GL_DEPTH_TEST)
 clock = pygame.time.Clock()
 
-vertex_shader = """
-#version 460
+shaders = shadersConstants()
+option = input("\nChoose your shader \n 1. Normals\n 2. Circles\n 3. Dots\n")
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 ccolor;
-
-uniform mat4 CameraMatrix;
-
-out vec3 mycolor;
-
-void main() 
-{
-  gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
-  mycolor = ccolor;
-}
-"""
-
-fragment_shader = """
-#version 460
-layout(location = 0) out vec4 fragColor;
-
-uniform int clock;
-in vec3 mycolor;
-
-void main()
-{
-  if (mod(clock/10, 2) == 0) {
-    fragColor = vec4(mycolor.xyz, 1.0f);
-  } else {
-    fragColor = vec4(mycolor.zxy, 1.0f);
-  }
-}
-"""
-
-cvs = compileShader(vertex_shader, GL_VERTEX_SHADER)
-cfs = compileShader(fragment_shader, GL_FRAGMENT_SHADER)
-
-shader = compileProgram(cvs, cfs)
+if (option == "1"):
+  cvs, cfs = shaders.shader_normal()
+  shader = compileProgram(cvs, cfs)
+elif (option == "2"):
+  cvsC, cfsC = shaders.shader_Circles()
+  shader = compileProgram(cvsC, cfsC)
+elif (option == "3"):
+  cvsC, cfsC = shaders.shader_Circles()
+  shader = compileProgram(cvsC, cfsC)
+else:
+  cvs, cfs = shaders.shader_normal()
+  shader = compileProgram(cvs, cfs)
 
 mesh = Obj('./Proyect3/models/model.obj')
 
@@ -97,7 +74,6 @@ glVertexAttribPointer(
 glEnableVertexAttribArray(1)
 
 glUseProgram(shader)
-
 
 def render(roteView, zoomInCamera):
   MODEL.rotationCamera(roteView)
@@ -143,10 +119,10 @@ while running:
 
   keys = pygame.key.get_pressed() 
   if keys[pygame.K_a]: 
-    roteView -= 1
+    roteView += 1
 
   if keys[pygame.K_d]: 
-    roteView += 1
+    roteView -= 1
 
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
@@ -157,4 +133,4 @@ while running:
         zoomInCamera -= 0.1
       if event.key == pygame.K_s:
         zoomInCamera += 0.1
-      #   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) to use normals
+        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) # to use normals

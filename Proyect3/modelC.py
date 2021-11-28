@@ -1,5 +1,6 @@
 
-
+from OpenGL.GL import *
+from OpenGL.GL.shaders import compileProgram, compileShader
 import glm
 
 class ModelConstants():
@@ -21,3 +22,82 @@ class ModelConstants():
     def zoomCamera(self, zoomRate):
         # Idk why you have to multiply the angle to make a zoom in or zoom out of the camera
         self.projection = glm.perspective(glm.radians(zoomRate * 45), 1.667, 0.1, 1000.0) 
+
+class shadersConstants():
+    def __init__(self) -> None:
+        self.fragment_shader_circles = """
+            #version 460
+            layout(location = 0) out vec4 fragColor;
+
+            uniform int clock;
+            in vec3 mycolor;
+
+            void main()
+            {
+            if (mod(clock/10, 2) == 0) {
+                fragColor = vec4(mycolor.xyz, 1.0f);
+            } else {
+                fragColor = vec4(mycolor.zxy, 1.0f);
+            }
+            }
+            """
+        self.vertex_shader_circles = """
+            #version 460
+
+            layout (location = 0) in vec3 position;
+            layout (location = 1) in vec3 ccolor;
+
+            uniform mat4 CameraMatrix;
+
+            out vec3 mycolor;
+
+            void main() 
+            {
+            gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
+            mycolor = ccolor;
+            }
+            """
+        self.vertex_shader = """
+            #version 460
+
+            layout (location = 0) in vec3 position;
+            layout (location = 1) in vec3 ccolor;
+
+            uniform mat4 CameraMatrix;
+
+            out vec3 mycolor;
+
+            void main() 
+            {
+            gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
+            mycolor = ccolor;
+            }
+            """
+
+        self.fragment_shader = """
+            #version 460
+            layout(location = 0) out vec4 fragColor;
+
+            uniform int clock;
+            in vec3 mycolor;
+
+            void main()
+            {
+            if (mod(clock/10, 2) == 0) {
+                fragColor = vec4(mycolor.xyz, 1.0f);
+            } else {
+                fragColor = vec4(mycolor.zxy, 1.0f);
+            }
+            }
+            """
+
+    def shader_Circles(self):
+        cvsC = compileShader(self.vertex_shader_circles, GL_VERTEX_SHADER)
+        cfsC = compileShader(self.fragment_shader_circles, GL_FRAGMENT_SHADER)
+        return cvsC, cfsC
+
+    def shader_normal(self):
+        cvs = compileShader(self.vertex_shader, GL_VERTEX_SHADER)
+        cfs = compileShader(self.fragment_shader, GL_FRAGMENT_SHADER)
+        return cvs, cfs
+
