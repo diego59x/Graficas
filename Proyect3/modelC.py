@@ -25,36 +25,34 @@ class ModelConstants():
 
 class shadersConstants():
     def __init__(self) -> None:
-        self.fragment_shader_circles = """
-            #version 460
-            layout(location = 0) out vec4 fragColor;
-
-            uniform int clock;
-            in vec3 mycolor;
-
-            void main()
-            {
-            if (mod(clock/10, 2) == 0) {
-                fragColor = vec4(mycolor.xyz, 1.0f);
-            } else {
-                fragColor = vec4(mycolor.zxy, 1.0f);
-            }
-            }
-            """
         self.vertex_shader_circles = """
             #version 460
-
-            layout (location = 0) in vec3 position;
-            layout (location = 1) in vec3 ccolor;
-
-            uniform mat4 CameraMatrix;
-
-            out vec3 mycolor;
-
             void main() 
             {
-            gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
-            mycolor = ccolor;
+                gl_FragCoord = vec4(0.2, 0.3, 0.1, 1.0);
+            }
+            """
+        self.fragment_shader_circles = """
+            #version 460
+            #ifdef GL_ES
+            precision lowp float;
+            #endif
+            uniform vec4 gl_FragCoord;
+
+            uniform vec2 u_resolution;
+
+            float circle_shape(float radius, vec2 position) {
+                float value = distance(position, vec2(0.5));
+                return step(radius, value);
+            }
+
+            void main() {
+                vec2 coord = gl_FragCoord.xy / u_resolution;
+                float circleWidth = 8.2;
+                float circle = circle_shape(circlewidth, coord);
+                vec3 color = vec3(circle);
+
+                gl_FragColor = vec4(color, 1.0);
             }
             """
         self.vertex_shader = """
