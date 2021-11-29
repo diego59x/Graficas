@@ -8,7 +8,7 @@ class ModelConstants():
     def __init__(self):
         self.i = glm.mat4(1)
         self.translate = glm.translate(self.i, glm.vec3(0, 0, 0))
-        self.scale = glm.scale(self.i, glm.vec3(10, 10, 10))
+        self.scale = glm.scale(self.i, glm.vec3(15, 15, 15))
         self.rotate = glm.rotate(self.i, glm.radians(0), glm.vec3(0, 1, 0))
         self.view = glm.lookAt(glm.vec3(0, 0, 20), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
         self.projection = glm.perspective(glm.radians(45), 1.667, 0.1, 1000.0) 
@@ -27,32 +27,42 @@ class shadersConstants():
     def __init__(self) -> None:
         self.vertex_shader_circles = """
             #version 460
+
+            layout (location = 0) in vec3 position;
+            layout (location = 1) in vec3 ccolor;
+
+            uniform mat4 CameraMatrix;
+
+            out vec3 mycolor;
+            out vec3 model;
+
             void main() 
             {
-                gl_FragCoord = vec4(0.2, 0.3, 0.1, 1.0);
+                model = position;
+                gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
+                mycolor = ccolor;
             }
             """
         self.fragment_shader_circles = """
             #version 460
-            #ifdef GL_ES
-            precision lowp float;
-            #endif
-            uniform vec4 gl_FragCoord;
+            layout(location = 0) out vec4 fragColor;
 
-            uniform vec2 u_resolution;
+            uniform int clock;
+            in vec3 mycolor;
+            in vec3 model;
 
-            float circle_shape(float radius, vec2 position) {
-                float value = distance(position, vec2(0.5));
-                return step(radius, value);
+            void main()
+            {
+            if (pow(model.x - 1.5, 2.0) + pow(model.y - 4.5, 2.0) < pow(4.4, 2.0) ){
+                fragColor = vec4(mycolor.xyz, 1.0f);
+            } else if (pow(model.x - 0.5, 2.0) + pow(model.y - 0.2, 2.0) < pow(0.4, 2.0) ){
+                fragColor = vec4(mycolor.xyz, 1.0f);
+            } else if (pow(model.x - 0.1, 2.0) + pow(model.y - 0.2, 2.0) < pow(0.02, 2.0) ){
+                fragColor = vec4(mycolor.xyz, 1.0f);
+            }else {
+                fragColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
 
-            void main() {
-                vec2 coord = gl_FragCoord.xy / u_resolution;
-                float circleWidth = 8.2;
-                float circle = circle_shape(circlewidth, coord);
-                vec3 color = vec3(circle);
-
-                gl_FragColor = vec4(color, 1.0);
             }
             """
         self.vertex_shader = """
