@@ -54,7 +54,7 @@ class shadersConstants():
             void main()
             {
             if (pow(model.x - 1.5, 2.0) + pow(model.y - 4.5, 2.0) < pow(4.4, 2.0) ){
-                fragColor = vec4(mycolor.xyz, 1.0f);
+                fragColor = vec4(0.1, 0.6, 0.8, 1.0f);
             } else if (pow(model.x - 0.5, 2.0) + pow(model.y - 0.2, 2.0) < pow(0.4, 2.0) ){
                 fragColor = vec4(mycolor.xyz, 1.0f);
             } else if (pow(model.x - 0.1, 2.0) + pow(model.y - 0.2, 2.0) < pow(0.02, 2.0) ){
@@ -98,6 +98,41 @@ class shadersConstants():
             }
             }
             """
+        self.vertex_shader_old = """
+            #version 460
+
+            layout (location = 0) in vec3 position;
+            layout (location = 1) in vec3 ccolor;
+
+            uniform mat4 CameraMatrix;
+
+            out vec3 mycolor;
+
+            void main() 
+            {
+                gl_Position = CameraMatrix * vec4(position.x, position.y, position.z, 1);
+                mycolor = ccolor;
+            }
+            """
+
+        self.fragment_shader_old = """
+            #version 460
+            layout(location = 0) out vec4 fragColor;
+            in vec3 mycolor;
+
+            void main()
+            {
+                float average = (mycolor.x + mycolor.y + mycolor.z)/3.0;
+                if (average <= 0.2f) {
+                    fragColor = vec4(0,0,0,1.0f);
+                }else if (average >= 0.2f && average <= 0.4){
+                    fragColor = vec4(0.5,0.5,0.5, 1.0f);
+                }
+                else {
+                    fragColor = vec4(1,1,1, 1.0f);
+                }
+            }
+            """
 
     def shader_Circles(self):
         cvsC = compileShader(self.vertex_shader_circles, GL_VERTEX_SHADER)
@@ -108,4 +143,8 @@ class shadersConstants():
         cvs = compileShader(self.vertex_shader, GL_VERTEX_SHADER)
         cfs = compileShader(self.fragment_shader, GL_FRAGMENT_SHADER)
         return cvs, cfs
+    def shader_old(self):
+        cvsS = compileShader(self.vertex_shader_old, GL_VERTEX_SHADER)
+        cfsS = compileShader(self.fragment_shader_old, GL_FRAGMENT_SHADER)
+        return cvsS, cfsS
 

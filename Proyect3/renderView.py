@@ -18,23 +18,20 @@ glEnable(GL_DEPTH_TEST)
 clock = pygame.time.Clock()
 
 shaders = shadersConstants()
-# option = input("\nChoose your shader \n 1. Normals\n 2. Circles\n 3. Dots\n")
+option = input("\nChoose your shader \n 1. Normals\n 2. Circles\n 3. Black n white\n")
 
-# if (option == "1"):
-#   cvs, cfs = shaders.shader_normal()
-#   shader = compileProgram(cvs, cfs)
-# elif (option == "2"):
-#   cvsC, cfsC = shaders.shader_Circles()
-#   shader = compileProgram(cvsC, cfsC)
-# elif (option == "3"):
-#   cvsC, cfsC = shaders.shader_Circles()
-#   shader = compileProgram(cvsC, cfsC)
-# else:
-#   cvs, cfs = shaders.shader_normal()
-#   shader = compileProgram(cvs, cfs)
-
-cvsC, cfsC = shaders.shader_Circles()
-shader = compileProgram(cvsC, cfsC)
+if (option == "1"):
+  cvs, cfs = shaders.shader_normal()
+  shader = compileProgram(cvs, cfs)
+elif (option == "2"):
+  cvsC, cfsC = shaders.shader_Circles()
+  shader = compileProgram(cvsC, cfsC)
+elif (option == "3"):
+  cvsO, cfsO = shaders.shader_old()
+  shader = compileProgram(cvsO, cfsO)
+else:
+  cvs, cfs = shaders.shader_normal()
+  shader = compileProgram(cvs, cfs)
 
 mesh = Obj('./Proyect3/models/jarron.obj')
 
@@ -136,4 +133,9 @@ while running:
         zoomInCamera -= 0.1
       if event.key == pygame.K_s:
         zoomInCamera += 0.1
-        # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) # to use normals
+      if event.key == pygame.K_q:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) # x-ray view
+      if event.key == pygame.K_e:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) # revert x-ray view
+      if event.key == pygame.K_f:
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT) # POINTS view
